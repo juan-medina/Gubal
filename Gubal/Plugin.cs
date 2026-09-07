@@ -1,9 +1,11 @@
+using System;
+using System.IO;
 using Dalamud.Game.Command;
+using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
-using System.IO;
-using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
+using Dalamud.Utility;
 using Gubal.Windows;
 
 namespace Gubal;
@@ -24,22 +26,21 @@ public sealed class Plugin : IDalamudPlugin
 
     public readonly WindowSystem WindowSystem = new("Gubal");
     private ConfigWindow ConfigWindow { get; init; }
-    private MainWindow MainWindow { get; init; }
 
     public Plugin()
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
 
-        // You might normally want to embed resources and load them from the manifest stream
-        var goatImagePath = Path.Combine(PluginInterface.AssemblyLocation.Directory?.FullName!, "goat.png");
-
         ConfigWindow = new ConfigWindow(this);
-        MainWindow = new MainWindow(this, goatImagePath);
 
         WindowSystem.AddWindow(ConfigWindow);
-        WindowSystem.AddWindow(MainWindow);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
+        {
+            HelpMessage = "A useful message to display in /xlhelp"
+        });
+
+        CommandManager.AddHandler("/wiki", new CommandInfo(OnWikiCommand)
         {
             HelpMessage = "A useful message to display in /xlhelp"
         });
@@ -52,12 +53,7 @@ public sealed class Plugin : IDalamudPlugin
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
 
         // Adds another button doing the same but for the main ui of the plugin
-        PluginInterface.UiBuilder.OpenMainUi += ToggleMainUi;
-
-        // Add a simple message to the log with level set to information
-        // Use /xllog to open the log window in-game
-        // Example Output: 00:57:54.959 | INF | [Gubal] ===A cool log message from Gubal===
-        Log.Information($"===A cool log message from {PluginInterface.Manifest.Name}===");
+        PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
     }
 
     public void Dispose()
@@ -65,22 +61,32 @@ public sealed class Plugin : IDalamudPlugin
         // Unregister all actions to not leak anything during disposal of plugin
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
-        PluginInterface.UiBuilder.OpenMainUi -= ToggleMainUi;
+        PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
         
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
-        MainWindow.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
+        CommandManager.RemoveHandler("/wiki");
     }
 
     private void OnCommand(string command, string args)
     {
+        Log.Information($"command: {command}, args: {args}");
+
         // In response to the slash command, toggle the display status of our main ui
-        MainWindow.Toggle();
+        ConfigWindow.Toggle();
+    }
+
+    private void OnWikiCommand(string command, string args)
+    {
+        Log.Information($"command: {command}, args: {args}");
+
+        string url = $"https://ffxiv.consolegameswiki.com/mediawiki/index.php?search={args}";
+
+        Dalamud.Utility.Util.OpenLink(url);
     }
     
     public void ToggleConfigUi() => ConfigWindow.Toggle();
-    public void ToggleMainUi() => MainWindow.Toggle();
 }
