@@ -36,11 +36,11 @@ public sealed class Plugin : IDalamudPlugin
 
         WindowSystem.AddWindow(ConfigWindow);
 
-        SearchService = new SearchService();
+        SearchService = new SearchService(Configuration);
 
         CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
-            HelpMessage = "A useful message to display in /xlhelp"
+            HelpMessage = "Open Gubal configuration"
         });
 
         // Tell the UI system that we want our windows to be drawn through the window system
@@ -73,7 +73,6 @@ public sealed class Plugin : IDalamudPlugin
     {
         Log.Information($"command: {command}, args: {args}");
 
-        // In response to the slash command, toggle the display status of our main ui
         ConfigWindow.Toggle();
     }
 

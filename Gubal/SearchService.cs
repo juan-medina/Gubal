@@ -7,19 +7,17 @@ using Dalamud.Game.Command;
 
 namespace Gubal;
 
-public record SearchCommand(string Url, string HelpMessage, bool Enabled = true);
-
 public partial class SearchService : IDisposable
 {
-    private readonly Dictionary<string, SearchCommand> _commands = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Configuration _configuration;
 
     [GeneratedRegex(@"^https:\/\/[a-zA-Z0-9\-\.]+(:\d+)?(\/.*)?$", RegexOptions.IgnoreCase)]
     private static partial Regex UrlRegex();
 
-    public SearchService()
+    public SearchService(Configuration? configuration = null)
     {
-        _commands.Add("/wiki", new SearchCommand("https://ffxiv.consolegameswiki.com/mediawiki/index.php?search={text}", "Search in wiki"));
-        foreach (var (name, cmd) in _commands)
+        _configuration = configuration ?? new Configuration();
+        foreach (var (name, cmd) in _configuration.SearchCommands)
         {
             if (Plugin.CommandManager.Commands.ContainsKey(name))
             {
@@ -41,7 +39,7 @@ public partial class SearchService : IDisposable
             return;
         }
 
-        if (_commands.TryGetValue(command, out var searchCommand))
+        if (_configuration.SearchCommands.TryGetValue(command, out var searchCommand))
         {
             if (!searchCommand.Enabled)
             {
@@ -60,7 +58,7 @@ public partial class SearchService : IDisposable
 
     public void Dispose()
     { 
-        foreach (var name in _commands.Keys)
+        foreach (var name in _configuration.SearchCommands.Keys)
         {
             Plugin.CommandManager.RemoveHandler(name);
         }
