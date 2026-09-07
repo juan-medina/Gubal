@@ -1,4 +1,42 @@
-.vs/
-obj/
+# Other
+.*/
+
+# Build output
 bin/
+obj/
+
+# Visual Studio
+.vs/
 *.user
+*.suo
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+*.nupkg
+packages/
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Temp files
+*.tmp
+
+# IDEs
+.idea/
+.vscode/
+*.user
+
+# workflows
+!.github/
+!.github/workflows/
+!.github/workflows/**
+
+# Python Env
+/.venv/
+

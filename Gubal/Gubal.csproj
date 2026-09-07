@@ -4,11 +4,11 @@
     <Version>0.0.0.1</Version>
     <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
     <Author>your name here</Author>
-    <Name>Sample Plugin</Name>
+    <Name>Gubal</Name>
     <Punchline>A short one-liner that shows up in /xlplugins.</Punchline>
     <Description>A brief overview of what your plugin does, highlighting its key features.
 This is shown when the user expands the plugin entry in /xlplugins.</Description>
-    <RepoUrl>https://github.com/goatcorp/SamplePlugin</RepoUrl>
+    <RepoUrl>https://github.com/juan-medina/Gubal</RepoUrl>
     <Tags>sample;plugin;goats</Tags>
   </PropertyGroup>
 
