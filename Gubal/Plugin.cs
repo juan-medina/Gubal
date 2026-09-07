@@ -26,6 +26,7 @@ public sealed class Plugin : IDalamudPlugin
 
     public readonly WindowSystem WindowSystem = new("Gubal");
     private ConfigWindow ConfigWindow { get; init; }
+    public SearchService SearchService { get; init; }
 
     public Plugin()
     {
@@ -35,12 +36,9 @@ public sealed class Plugin : IDalamudPlugin
 
         WindowSystem.AddWindow(ConfigWindow);
 
-        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
-        {
-            HelpMessage = "A useful message to display in /xlhelp"
-        });
+        SearchService = new SearchService();
 
-        CommandManager.AddHandler("/wiki", new CommandInfo(OnWikiCommand)
+        CommandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "A useful message to display in /xlhelp"
         });
@@ -66,9 +64,9 @@ public sealed class Plugin : IDalamudPlugin
         WindowSystem.RemoveAllWindows();
 
         ConfigWindow.Dispose();
+        SearchService.Dispose();
 
         CommandManager.RemoveHandler(CommandName);
-        CommandManager.RemoveHandler("/wiki");
     }
 
     private void OnCommand(string command, string args)
@@ -79,14 +77,6 @@ public sealed class Plugin : IDalamudPlugin
         ConfigWindow.Toggle();
     }
 
-    private void OnWikiCommand(string command, string args)
-    {
-        Log.Information($"command: {command}, args: {args}");
 
-        string url = $"https://ffxiv.consolegameswiki.com/mediawiki/index.php?search={args}";
-
-        Dalamud.Utility.Util.OpenLink(url);
-    }
-    
     public void ToggleConfigUi() => ConfigWindow.Toggle();
 }
