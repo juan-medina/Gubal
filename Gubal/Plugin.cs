@@ -31,9 +31,7 @@ public sealed class Plugin : IDalamudPlugin
     public Plugin()
     {
         Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-
         ConfigWindow = new ConfigWindow(this);
-
         WindowSystem.AddWindow(ConfigWindow);
 
         SearchService = new SearchService(Configuration);
@@ -43,20 +41,13 @@ public sealed class Plugin : IDalamudPlugin
             HelpMessage = "Open Gubal configuration"
         });
 
-        // Tell the UI system that we want our windows to be drawn through the window system
         PluginInterface.UiBuilder.Draw += WindowSystem.Draw;
-
-        // This adds a button to the plugin installer entry of this plugin which allows
-        // toggling the display status of the configuration ui
         PluginInterface.UiBuilder.OpenConfigUi += ToggleConfigUi;
-
-        // Adds another button doing the same but for the main ui of the plugin
         PluginInterface.UiBuilder.OpenMainUi += ToggleConfigUi;
     }
 
     public void Dispose()
     {
-        // Unregister all actions to not leak anything during disposal of plugin
         PluginInterface.UiBuilder.Draw -= WindowSystem.Draw;
         PluginInterface.UiBuilder.OpenConfigUi -= ToggleConfigUi;
         PluginInterface.UiBuilder.OpenMainUi -= ToggleConfigUi;
@@ -69,13 +60,6 @@ public sealed class Plugin : IDalamudPlugin
         CommandManager.RemoveHandler(CommandName);
     }
 
-    private void OnCommand(string command, string args)
-    {
-        Log.Information($"command: {command}, args: {args}");
-
-        ConfigWindow.Toggle();
-    }
-
-
-    public void ToggleConfigUi() => ConfigWindow.Toggle();
+    private void OnCommand(string command, string args) => ConfigWindow.Toggle();
+    private void ToggleConfigUi() => ConfigWindow.Toggle();
 }

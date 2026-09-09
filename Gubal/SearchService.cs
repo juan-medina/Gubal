@@ -1,36 +1,21 @@
-
-
 using System;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using Dalamud.Game.Command;
 
 namespace Gubal;
 
-public partial class SearchService : IDisposable
+public class SearchService : IDisposable
 {
     private readonly Configuration _configuration;
-
-    [GeneratedRegex(@"^https:\/\/[a-zA-Z0-9\-\.]+(:\d+)?(\/.*)?$", RegexOptions.IgnoreCase)]
-    private static partial Regex UrlRegex();
+    private readonly HashSet<string> _registeredCommands = new(StringComparer.OrdinalIgnoreCase);
 
     public SearchService(Configuration? configuration = null)
     {
         _configuration = configuration ?? new Configuration();
-        foreach (var (name, cmd) in _configuration.SearchCommands)
-        {
-            if (Plugin.CommandManager.Commands.ContainsKey(name))
-            {
-                continue;
-            }
-            Plugin.CommandManager.AddHandler(name, new CommandInfo(OnCommand)
-            {
-                HelpMessage = cmd.HelpMessage
-            });
-        }
+        ReloadCommands();
     }
 
-    public bool IsValidUrl(string url) => !string.IsNullOrEmpty(url) && UrlRegex().IsMatch(url);
+    public bool IsValidUrl(string url) => UrlValidator.IsValidUrl(url);
 
     public void search(string command, string args)
     {
@@ -56,12 +41,73 @@ public partial class SearchService : IDisposable
         }
     }
 
-    public void Dispose()
-    { 
-        foreach (var name in _configuration.SearchCommands.Keys)
+    public void ReloadCommands()
+    {
+        foreach (var name in _registeredCommands)
         {
             Plugin.CommandManager.RemoveHandler(name);
         }
+        _registeredCommands.Clear();
+
+        foreach (var (name, cmd) in _configuration.SearchCommands)
+        {
+            if (Plugin.CommandManager.Commands.ContainsKey(name))
+            {
+                continue;
+            }
+            Plugin.CommandManager.AddHandler(name, new CommandInfo(OnCommand)
+            {
+                HelpMessage = cmd.HelpMessage
+            });
+            _registeredCommands.Add(name);
+        }
+    }
+
+    public bool AddCommand(string name, SearchCommand cmd)
+    {
+        if (string.IsNullOrWhiteSpace(name) || !UrlValidator.IsValidUrl(cmd.Url))
+        {
+            return false;
+        }
+
+        _configuration.SearchCommands[name] = cmd;
+        _configuration.Save();
+        ReloadCommands();
+        return true;
+    }
+
+    public bool RemoveCommand(string name)
+    {
+        if (!_configuration.SearchCommands.Remove(name))
+        {
+            return false;
+        }
+
+        _configuration.Save();
+        ReloadCommands();
+        return true;
+    }
+
+    public void UpdateCommand(string name, SearchCommand cmd)
+    {
+        _configuration.SearchCommands[name] = cmd;
+        _configuration.Save();
+        ReloadCommands();
+    }
+
+    public void ResetToDefaults()
+    {
+        _configuration.Reset();
+        ReloadCommands();
+    }
+
+    public void Dispose()
+    { 
+        foreach (var name in _registeredCommands)
+        {
+            Plugin.CommandManager.RemoveHandler(name);
+        }
+        _registeredCommands.Clear();
     }
     
     public void OnCommand(string command, string args)
