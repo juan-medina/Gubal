@@ -2,15 +2,30 @@
 <Project Sdk="Dalamud.NET.Sdk/15.0.0">
     <PropertyGroup>
         <Version>0.0.0.1</Version>
-        <!-- Manifest fields (see https://github.com/goatcorp/DalamudPackager/blob/827d88dc/DalamudPackager/DalamudPackager.cs#L420) -->
-        <Author>your name here</Author>
+        <Author>Juan Medina</Author>
         <Name>Gubal</Name>
-        <Punchline>A short one-liner that shows up in /xlplugins.</Punchline>
+        <Punchline>Search wikis, Lodestone, and websites directly from your chat bar.</Punchline>
         <Description>
-            A brief overview of what your plugin does, highlighting its key features.
-            This is shown when the user expands the plugin entry in /xlplugins.
+Inspired by the beloved /wiki command from Guild Wars 2, Gubal brings fast in-game web lookups directly to your chat bar. Named after the Great Gubal Library, it lets you query online resources without having to Alt-Tab or open your browser manually—just type a slash command followed by your search query, and Gubal opens the results right away.
+
+Commands and Examples:
+
+/wiki [query] - Search the FFXIV Console Games Wiki:
+- /wiki great gubal library (opens The Great Gubal Library dungeon guide)
+- /wiki sightseeing log (opens the Sightseeing Log guide)
+- /wiki relic weapons (opens the Relic Weapon progression guide)
+- /wiki blue mage spells (opens the Blue Mage spell list)
+
+/lodestone [query] - Search the official Lodestone:
+- /lodestone patch 7.56 (opens the Patch 7.56 notes directly)
+- /lodestone maintenance (opens latest server maintenance notices)
+- /lodestone eorzea database excalibur (opens official item details)
+- /lodestone community finder (opens the Community Finder)
+
+/gubal - Open the configuration window to add, edit, or customize search commands with the {text} placeholder.
         </Description>
         <RepoUrl>https://github.com/juan-medina/Gubal</RepoUrl>
-        <Tags>sample;plugin;goats</Tags>
+        <IconUrl>https://raw.githubusercontent.com/juan-medina/Gubal/main/Gubal/icon.png</IconUrl>
+        <Tags>search;wiki;lodestone;utility;chat;web;browser</Tags>
     </PropertyGroup>
 </Project>
