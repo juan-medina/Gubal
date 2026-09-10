@@ -29,7 +29,7 @@ public class ConfigWindow : Window, IDisposable
     private string newUrl = string.Empty;
     private string errorMessage = string.Empty;
 
-    public ConfigWindow(Plugin plugin) : base("Gubal Configuration###GubalConfigWindow2")
+    public ConfigWindow(Plugin plugin) : base("Gubal Configuration###GubalConfigWindow")
     {
         Size = new Vector2(750, 420);
         SizeCondition = ImGuiCond.FirstUseEver;
