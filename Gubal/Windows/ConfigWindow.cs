@@ -29,7 +29,7 @@ public class ConfigWindow : Window, IDisposable
     private string newUrl = string.Empty;
     private string errorMessage = string.Empty;
 
-    public ConfigWindow(Plugin plugin) : base("Gubal Configuration###GubalConfigWindow1")
+    public ConfigWindow(Plugin plugin) : base("Gubal Configuration###GubalConfigWindow2")
     {
         Size = new Vector2(750, 420);
         SizeCondition = ImGuiCond.FirstUseEver;
@@ -74,6 +74,17 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
+        ImGui.TextUnformatted("Configure custom slash commands to search web resources directly from chat.");
+        ImGui.SameLine();
+        ImGuiComponents.HelpMarker(
+            "How Gubal works:\n" +
+            "• Enter a slash command (e.g. /wiki).\n" +
+            "• Provide a search URL containing {text} where your query will be inserted.\n" +
+            "• In chat, type: /wiki Dreadwyrm Trance\n" +
+            "  Gubal replaces {text} with 'Dreadwyrm Trance' and opens your browser.");
+
+        ImGui.Spacing();
+
         var style = ImGui.GetStyle();
         var footerHeight = ImGui.GetFrameHeight() + style.ItemSpacing.Y + 8f;
         if (!string.IsNullOrEmpty(errorMessage))
@@ -108,7 +119,40 @@ public class ConfigWindow : Window, IDisposable
             ImGui.TableSetupColumn("URL ({text} placeholder)", ImGuiTableColumnFlags.WidthStretch, 260);
             ImGui.TableSetupColumn("Enabled", ImGuiTableColumnFlags.WidthFixed, 65);
             ImGui.TableSetupColumn(string.Empty, ImGuiTableColumnFlags.WidthFixed, 40);
-            ImGui.TableHeadersRow();
+            ImGui.TableNextRow(ImGuiTableRowFlags.Headers);
+            ImGui.TableNextColumn();
+            ImGui.TableHeader("#");
+
+            ImGui.TableNextColumn();
+            ImGui.TableHeader("Command");
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("The slash command to type in chat (e.g. /wiki). The leading '/' is added automatically.");
+            }
+
+            ImGui.TableNextColumn();
+            ImGui.TableHeader("Help Message");
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Optional description shown in Dalamud's /xlhelp command list.");
+            }
+
+            ImGui.TableNextColumn();
+            ImGui.TableHeader("URL ({text} placeholder)");
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Search URL containing {text}. The placeholder will be replaced with your query arguments.");
+            }
+
+            ImGui.TableNextColumn();
+            ImGui.TableHeader("Enabled");
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("Toggle whether this command is active in game without deleting it.");
+            }
+
+            ImGui.TableNextColumn();
+            ImGui.TableHeader(string.Empty);
 
             int toRemove = -1;
 
@@ -234,6 +278,18 @@ public class ConfigWindow : Window, IDisposable
         }
 
         var formattedName = "/" + trimmedName.TrimStart('/');
+        if (formattedName == "/")
+        {
+            errorMessage = "Command name cannot be empty.";
+            return false;
+        }
+
+        if (formattedName.Contains(' '))
+        {
+            errorMessage = "Command name cannot contain spaces.";
+            return false;
+        }
+
         if (commandEntries.Any(c => string.Equals(c.Name, formattedName, StringComparison.OrdinalIgnoreCase)))
         {
             errorMessage = $"Command '{formattedName}' already exists.";
@@ -247,9 +303,15 @@ public class ConfigWindow : Window, IDisposable
             return false;
         }
 
+        if (!UrlValidator.HasTextPlaceholder(trimmedUrl))
+        {
+            errorMessage = "URL must contain the '{text}' placeholder.";
+            return false;
+        }
+
         if (!UrlValidator.IsValidUrl(trimmedUrl))
         {
-            errorMessage = "URL is not valid.";
+            errorMessage = "URL must be a valid HTTPS link.";
             return false;
         }
 
@@ -308,6 +370,18 @@ public class ConfigWindow : Window, IDisposable
             }
 
             var formattedName = "/" + trimmedName.TrimStart('/');
+            if (formattedName == "/")
+            {
+                errorMessage = "Command name cannot be empty.";
+                return false;
+            }
+
+            if (formattedName.Contains(' '))
+            {
+                errorMessage = $"Command '{formattedName}' cannot contain spaces.";
+                return false;
+            }
+
             if (dict.ContainsKey(formattedName))
             {
                 errorMessage = $"Duplicate command '{formattedName}' found.";
@@ -321,9 +395,15 @@ public class ConfigWindow : Window, IDisposable
                 return false;
             }
 
+            if (!UrlValidator.HasTextPlaceholder(trimmedUrl))
+            {
+                errorMessage = $"URL for '{formattedName}' must contain the '{{text}}' placeholder.";
+                return false;
+            }
+
             if (!UrlValidator.IsValidUrl(trimmedUrl))
             {
-                errorMessage = $"URL for '{formattedName}' is not valid.";
+                errorMessage = $"URL for '{formattedName}' must be a valid HTTPS link.";
                 return false;
             }
 

@@ -2,16 +2,16 @@
 
 <p align="center"><img src="Gubal/icon.png"></p>
 
-> Search wikis, Lodestone, and websites directly from your Final Fantasy XIV chat bar.
+> Open web pages, wikis, and Lodestone articles in your browser directly from your Final Fantasy XIV chat bar.
 
-Inspired by the beloved `/wiki` command from **Guild Wars 2**, **Gubal** brings fast, seamless in-game web lookups directly to your chat bar. Named after the Great Gubal Library, it lets you query online resources without having to Alt-Tab or open your browser manually—just type a slash command followed by your search query, and Gubal opens the results right away.
+Inspired by the `/wiki` command from **Guild Wars 2**, **Gubal** lets you open web pages in your default browser straight from the in-game chat bar. Named after the Great Gubal Library, just type a slash command followed by what you're looking for, and Gubal opens the destination page right away—making it effortless to jump directly to specific guides, item pages, and online resources.
 
 ---
 
 ## Commands & Examples
 
 ### `/wiki [query]`
-Searches the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/):
+Opens the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/) in your browser. Typing specific terms jumps straight to concrete guides:
 
 - `/wiki great gubal library` &rarr; opens [The Great Gubal Library](https://ffxiv.consolegameswiki.com/wiki/The_Great_Gubal_Library) dungeon guide
 - `/wiki sightseeing log` &rarr; opens the [Sightseeing Log](https://ffxiv.consolegameswiki.com/wiki/Sightseeing_Log) guide
@@ -19,7 +19,7 @@ Searches the [FFXIV Console Games Wiki](https://ffxiv.consolegameswiki.com/):
 - `/wiki blue mage spells` &rarr; opens the [Blue Mage Spells](https://ffxiv.consolegameswiki.com/wiki/Blue_Mage_Spells) list
 
 ### `/lodestone [query]`
-Searches the official [Final Fantasy XIV Lodestone](https://na.finalfantasyxiv.com/lodestone/):
+Searches the official [Final Fantasy XIV Lodestone](https://na.finalfantasyxiv.com/lodestone/) and opens the matching page in your browser:
 
 - `/lodestone patch 7.56` &rarr; opens [Patch 7.56 Notes](https://na.finalfantasyxiv.com/lodestone/topics/detail/a8a526ad64db45c8ca8d1c7fdcce8a5eedaa18bc) directly
 - `/lodestone maintenance` &rarr; opens latest server maintenance and status notices
@@ -39,6 +39,9 @@ Type `/gubal` in chat to manage your search commands:
 - **Enable / Disable:** Toggle commands on or off with the checkbox without deleting them.
 - **Edit / Delete:** Modify existing entries or remove them using the trash icon.
 - **Reset to Defaults:** Restore the default `/wiki` and `/lodestone` commands at any time.
+
+<p align="center"><img src="docs/config.png" alt="The config window showing the default commands"><br><i>Config window with the default commands</i></p>
+
 
 ---
 

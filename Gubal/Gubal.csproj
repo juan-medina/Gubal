@@ -4,19 +4,19 @@
         <Version>0.0.0.1</Version>
         <Author>Juan Medina</Author>
         <Name>Gubal</Name>
-        <Punchline>Search wikis, Lodestone, and websites directly from your chat bar.</Punchline>
+        <Punchline>Open web pages, wikis, and Lodestone articles in your browser directly from your chat bar.</Punchline>
         <Description>
-Inspired by the beloved /wiki command from Guild Wars 2, Gubal brings fast in-game web lookups directly to your chat bar. Named after the Great Gubal Library, it lets you query online resources without having to Alt-Tab or open your browser manually—just type a slash command followed by your search query, and Gubal opens the results right away.
+Inspired by the /wiki command from Guild Wars 2, Gubal lets you open web pages in your browser straight from the in-game chat bar. Named after the Great Gubal Library, just type a slash command followed by what you're looking for to jump directly to specific guides, item pages, and articles in your default browser.
 
 Commands and Examples:
 
-/wiki [query] - Search the FFXIV Console Games Wiki:
+/wiki [query] - Search the FFXIV Console Games Wiki (opens in browser):
 - /wiki great gubal library (opens The Great Gubal Library dungeon guide)
 - /wiki sightseeing log (opens the Sightseeing Log guide)
 - /wiki relic weapons (opens the Relic Weapon progression guide)
 - /wiki blue mage spells (opens the Blue Mage spell list)
 
-/lodestone [query] - Search the official Lodestone:
+/lodestone [query] - Search the official Lodestone (opens in browser):
 - /lodestone patch 7.56 (opens the Patch 7.56 notes directly)
 - /lodestone maintenance (opens latest server maintenance notices)
 - /lodestone eorzea database excalibur (opens official item details)

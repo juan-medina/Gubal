@@ -31,7 +31,7 @@ public class SearchService : IDisposable
                 return;
             }
 
-            string url = searchCommand.Url.Replace("{text}", args);
+            string url = searchCommand.Url.Replace("{text}", args, StringComparison.OrdinalIgnoreCase);
             if (!IsValidUrl(url))
             {
                 return;
