@@ -82,10 +82,10 @@ jobs:
           Expand-Archive -Path ./latest.zip -DestinationPath "$env:AppData\XIVLauncher\addon\Hooks\dev" -Force
 
       - name: Restore project dependencies
-        run: dotnet restore Gubal.sln --locked-mode --verbosity normal
+        run: dotnet restore Gubal.slnx --locked-mode --verbosity normal
 
       - name: Build Release
-        run: dotnet build Gubal.sln --no-restore --verbosity normal --configuration Release
+        run: dotnet build Gubal.slnx --no-restore --verbosity normal --configuration Release
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
@@ -93,7 +93,7 @@ jobs:
           name: Gubal-${{ needs.prepare.outputs.version }}
           path: |
             Gubal/bin/x64/Release
-            !ItsGubalUp/bin/x64/Release/Gubal
+            !Gubal/bin/x64/Release/Gubal
 
       # The SDK always names the package latest.zip; copy it under a stable, plugin-named asset
       # instead so the release archive is identifiable on its own.
