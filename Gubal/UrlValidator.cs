@@ -9,6 +9,4 @@ public static partial class UrlValidator
     private static partial Regex UrlRegex();
 
     public static bool IsValidUrl(string? url) => !string.IsNullOrWhiteSpace(url) && UrlRegex().IsMatch(url.Trim());
-
-    public static bool HasTextPlaceholder(string? url) => !string.IsNullOrWhiteSpace(url) && url.Contains("{text}", StringComparison.OrdinalIgnoreCase);
 }

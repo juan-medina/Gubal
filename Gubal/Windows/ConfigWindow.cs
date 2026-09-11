@@ -213,9 +213,8 @@ public class ConfigWindow : Window, IDisposable
             }
 
             if (toRemove >= 0 && toRemove < commandEntries.Count)
-            {
                 commandEntries.RemoveAt(toRemove);
-            }
+
 
             // New Row at the bottom
             ImGui.TableNextRow();
@@ -260,50 +259,57 @@ public class ConfigWindow : Window, IDisposable
         }
     }
 
+    private static string FormatCommandName(string rawName) => "/" + rawName.Trim().TrimStart('/');
+
+    private static string? ValidateCommand(string name, string url)
+    {
+        if (string.IsNullOrWhiteSpace(name) || name.TrimStart('/') == string.Empty)
+            return "Command name cannot be empty.";
+
+        if (name.Contains(' '))
+            return $"Command '{name}' cannot contain spaces.";
+
+        if (!UrlValidator.IsValidUrl(url))
+            return "URL must be a valid HTTPS link.";
+
+        if (!url.Contains("{text}", StringComparison.OrdinalIgnoreCase))
+            return "URL must contain the '{text}' placeholder.";
+
+        return null;
+    }
+
+    private string? GetTableError()
+    {
+        var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var entry in commandEntries)
+        {
+            var error = ValidateCommand(entry.Name, entry.Url);
+            if (error != null) return error;
+
+
+            var formattedName = FormatCommandName(entry.Name);
+            if (!names.Add(formattedName))
+                return $"Duplicate command '{formattedName}' found.";
+
+        }
+
+        return null;
+    }
+
     private bool TryAddNewCommand()
     {
-        var trimmedName = newCommandName.Trim();
-        if (string.IsNullOrWhiteSpace(trimmedName))
+        var error = ValidateCommand(newCommandName, newUrl);
+        if (error != null)
         {
-            errorMessage = "Command name cannot be empty.";
+            errorMessage = error;
             return false;
         }
 
-        var formattedName = "/" + trimmedName.TrimStart('/');
-        if (formattedName == "/")
-        {
-            errorMessage = "Command name cannot be empty.";
-            return false;
-        }
-
-        if (formattedName.Contains(' '))
-        {
-            errorMessage = "Command name cannot contain spaces.";
-            return false;
-        }
-
-        if (commandEntries.Any(c => string.Equals(c.Name, formattedName, StringComparison.OrdinalIgnoreCase)))
+        var formattedName = FormatCommandName(newCommandName);
+        if (commandEntries.Any(c => string.Equals(FormatCommandName(c.Name), formattedName, StringComparison.OrdinalIgnoreCase)))
         {
             errorMessage = $"Command '{formattedName}' already exists.";
-            return false;
-        }
-
-        var trimmedUrl = newUrl.Trim();
-        if (string.IsNullOrWhiteSpace(trimmedUrl))
-        {
-            errorMessage = "URL cannot be empty.";
-            return false;
-        }
-
-        if (!UrlValidator.HasTextPlaceholder(trimmedUrl))
-        {
-            errorMessage = "URL must contain the '{text}' placeholder.";
-            return false;
-        }
-
-        if (!UrlValidator.IsValidUrl(trimmedUrl))
-        {
-            errorMessage = "URL must be a valid HTTPS link.";
             return false;
         }
 
@@ -311,7 +317,7 @@ public class ConfigWindow : Window, IDisposable
         {
             Name = formattedName,
             HelpMessage = newHelpMessage.Trim(),
-            Url = trimmedUrl,
+            Url = newUrl.Trim(),
             Enabled = true
         });
 
@@ -343,60 +349,18 @@ public class ConfigWindow : Window, IDisposable
 
     private bool SaveConfig()
     {
-        if (!string.IsNullOrWhiteSpace(newCommandName) && !TryAddNewCommand()) return false;
-
-        var dict = new Dictionary<string, SearchCommand>(StringComparer.OrdinalIgnoreCase);
-        foreach (var entry in commandEntries)
+        var tableError = GetTableError();
+        if (tableError != null)
         {
-            var trimmedName = entry.Name.Trim();
-            if (string.IsNullOrWhiteSpace(trimmedName))
-            {
-                errorMessage = "Command name cannot be empty.";
-                return false;
-            }
-
-            var formattedName = "/" + trimmedName.TrimStart('/');
-            if (formattedName == "/")
-            {
-                errorMessage = "Command name cannot be empty.";
-                return false;
-            }
-
-            if (formattedName.Contains(' '))
-            {
-                errorMessage = $"Command '{formattedName}' cannot contain spaces.";
-                return false;
-            }
-
-            if (dict.ContainsKey(formattedName))
-            {
-                errorMessage = $"Duplicate command '{formattedName}' found.";
-                return false;
-            }
-
-            var trimmedUrl = entry.Url.Trim();
-            if (string.IsNullOrWhiteSpace(trimmedUrl))
-            {
-                errorMessage = $"URL for '{formattedName}' cannot be empty.";
-                return false;
-            }
-
-            if (!UrlValidator.HasTextPlaceholder(trimmedUrl))
-            {
-                errorMessage = $"URL for '{formattedName}' must contain the '{{text}}' placeholder.";
-                return false;
-            }
-
-            if (!UrlValidator.IsValidUrl(trimmedUrl))
-            {
-                errorMessage = $"URL for '{formattedName}' must be a valid HTTPS link.";
-                return false;
-            }
-
-            dict[formattedName] = new SearchCommand(trimmedUrl, entry.HelpMessage.Trim(), entry.Enabled);
+            errorMessage = tableError;
+            return false;
         }
 
-        configuration.SearchCommands = dict;
+        configuration.SearchCommands = commandEntries.ToDictionary(
+            e => FormatCommandName(e.Name),
+            e => new SearchCommand(e.Url.Trim(), e.HelpMessage.Trim(), e.Enabled),
+            StringComparer.OrdinalIgnoreCase);
+
         configuration.Save();
         plugin.SearchService.ReloadCommands();
         errorMessage = string.Empty;
