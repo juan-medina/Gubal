@@ -55,7 +55,7 @@ public class ConfigWindow : Window, IDisposable
         errorMessage = string.Empty;
     }
 
-    public void Dispose() { }
+    public void Dispose() => GC.SuppressFinalize(this);
 
     private void LoadFromConfig()
     {
@@ -154,9 +154,9 @@ public class ConfigWindow : Window, IDisposable
             ImGui.TableNextColumn();
             ImGui.TableHeader(string.Empty);
 
-            int toRemove = -1;
+            var toRemove = -1;
 
-            for (int i = 0; i < commandEntries.Count; i++)
+            for (var i = 0; i < commandEntries.Count; i++)
             {
                 var entry = commandEntries[i];
                 ImGui.TableNextRow();
@@ -244,25 +244,17 @@ public class ConfigWindow : Window, IDisposable
 
             // Column 5: + Icon Button
             ImGui.TableNextColumn();
-            bool canAdd = !string.IsNullOrWhiteSpace(newCommandName);
-            bool clickedAdd = false;
+            var canAdd = !string.IsNullOrWhiteSpace(newCommandName);
+            var clickedAdd = false;
 
             if (canAdd)
             {
-                if (ImGuiComponents.IconButton("###addNewCmd", FontAwesomeIcon.Plus))
-                {
-                    clickedAdd = true;
-                }
-                if (ImGui.IsItemHovered())
-                {
-                    ImGui.SetTooltip("Add command");
-                }
+                if (ImGuiComponents.IconButton("###addNewCmd", FontAwesomeIcon.Plus)) clickedAdd = true;
+
+                if (ImGui.IsItemHovered()) ImGui.SetTooltip("Add command");
             }
 
-            if ((clickedAdd || enterCmd || enterHelp || enterUrl) && canAdd)
-            {
-                TryAddNewCommand();
-            }
+            if ((clickedAdd || enterCmd || enterHelp || enterUrl) && canAdd) TryAddNewCommand();
 
             ImGui.EndTable();
         }
@@ -351,13 +343,7 @@ public class ConfigWindow : Window, IDisposable
 
     private bool SaveConfig()
     {
-        if (!string.IsNullOrWhiteSpace(newCommandName))
-        {
-            if (!TryAddNewCommand())
-            {
-                return false;
-            }
-        }
+        if (!string.IsNullOrWhiteSpace(newCommandName) && !TryAddNewCommand()) return false;
 
         var dict = new Dictionary<string, SearchCommand>(StringComparer.OrdinalIgnoreCase);
         foreach (var entry in commandEntries)
@@ -462,10 +448,7 @@ public class ConfigWindow : Window, IDisposable
             ImGui.SameLine();
             if (ImGuiComponents.IconButtonWithText(FontAwesomeIcon.Save, "Save"))
             {
-                if (SaveConfig())
-                {
-                    IsOpen = false;
-                }
+                if (SaveConfig()) IsOpen = false;
             }
             if (ImGui.IsItemHovered())
             {
